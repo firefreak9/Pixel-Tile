@@ -1,0 +1,46 @@
+#pragma once
+#include <pebble.h>
+
+typedef uint8_t PxColor;
+static const uint8_t PX_CH[4] = {0x00,0x55,0xAA,0xFF};
+static inline GColor px_to_gcolor(PxColor c){
+  return GColorFromRGB(PX_CH[(c>>4)&3],PX_CH[(c>>2)&3],PX_CH[c&3]);
+}
+#define PX_BLACK        0
+#define PX_OXFORD_BLUE  1
+#define PX_MALACHITE   13
+#define PX_WHITE       63
+
+typedef enum{UNIT_F=0,UNIT_C=1}TempUnit;
+typedef enum{TILE_EMPTY=0,TILE_WEATHER_NOW=1,TILE_WEATHER_HOURLY=2,TILE_WEATHER_DAILY=3,TILE_DATE=4,TILE_HEALTH=5,TILE_BATTERY=6}TileContent;
+
+// Health slot — what goes in each of the 3 health tile positions
+typedef enum{
+  HSLOT_STEPS=0,HSLOT_CALORIES=1,HSLOT_DISTANCE=2,HSLOT_SLEEP=3,
+  HSLOT_HEART_RATE=4,HSLOT_BATTERY=5,HSLOT_NONE=6,
+}HealthSlot;
+
+typedef enum{BAR_NONE=0,BAR_SUN=1,BAR_STEPS=2,BAR_CALORIES=3,BAR_BATTERY=4}BarContent;
+
+typedef struct{
+  bool        use_24h;
+  TempUnit    temp_unit;
+  TileContent tile[4];
+  bool        hourly_show_current_first;
+  // Health tile: slot_a=top-left, slot_b=bottom-left, slot_c=right (HSLOT_NONE = hide right col)
+  HealthSlot  health_slot_a;
+  HealthSlot  health_slot_b;
+  HealthSlot  health_slot_c;
+  int         step_goal;
+  int         cal_goal;
+  BarContent  top_bar_progress;
+  BarContent  bot_bar_progress;
+  PxColor     color_bg;
+  PxColor     color_border;
+  PxColor     color_fg;
+  PxColor     color_accent;
+}WatchConfig;
+
+extern WatchConfig g_config;
+void config_load(void);
+void config_save(void);
